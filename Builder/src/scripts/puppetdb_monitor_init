@@ -1,0 +1,102 @@
+#!/bin/bash
+#
+# chkconfig: - 70 10
+# description: puppetdb monitor
+
+### BEGIN INIT INFO
+# Provides:          puppetdb_monitor.sh
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: puppetdb_monitor.sh
+# Description:       Start puppetdb_monitor.sh daemon placed in /etc/init.d.
+### END INIT INFO
+
+# Copyright 2019 Ericsson AB
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+prog_main="puppetdb"
+prog="${prog_main}_monitor.sh"
+prog_base=$(/bin/basename "${prog}" ".sh")
+
+[ -e /etc/sysconfig/${prog_main} ] && . /etc/sysconfig/${prog_main}
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/share/${prog_main}/scripts
+PIDFILE="/var/run/${prog_main}/${prog_base}"
+START_TIMEOUT=${START_TIMEOUT:-120}
+
+find_my_pid() {
+    if [ ! -d  "/var/run/${prog_main}" ] ; then
+      mkdir -p "/var/run/${prog_main}"
+      chown -R "${USER}:${USER}" "/var/run/${prog_main}"
+    fi
+    pid=$(ps -ef | grep "${prog}" | grep -v 'grep' | awk '{print $2}')
+}
+
+start() {
+    rh_status_q
+    echo -n $"Starting $prog: "
+    daemon --user root --pidfile "${PIDFILE}" "${prog} &"
+    retval=$?
+    [ ${retval} -ne 0 ] && failure $"$base startup"
+    sleep 1
+    find_my_pid
+    echo "${pid}" > "${PIDFILE}"
+    [ -s "${PIDFILE}" ] && success $"$base startup" || failure $"$base startup"
+    echo
+    return $retval
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    find_my_pid
+    if [ ! -s "${PIDFILE}" ] ; then
+      echo "${pid}" > "${PIDFILE}"
+    fi
+    killproc -p "${PIDFILE}" -d ${SERVICE_STOP_RETRIES}s "${prog}"
+    retval=$?
+    [ $retval -eq 0 ] && success $"$base stopped" || failure $"$base stopped"
+    echo
+    [ $retval -eq 0 ] && rm -f "${PIDFILE}"
+    return $retval
+}
+
+restart() {
+    stop
+    start
+}
+
+rh_status() {
+    status -p "${PIDFILE}" "${prog}"
+}
+
+rh_status_q() {
+    rh_status >/dev/null 2>&1
+}
+
+
+case "$1" in
+    start)
+        rh_status_q && exit 0
+        $1
+        ;;
+    stop)
+        rh_status_q || exit 0
+        $1
+        ;;
+    restart)
+        $1
+        ;;
+    condrestart|try-restart)
+        rh_status_q || exit 0
+        restart
+        ;;
+    status)
+        rh_status
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|restart|condrestart|try-restart|status}"
+        exit 2
+esac
+exit $?

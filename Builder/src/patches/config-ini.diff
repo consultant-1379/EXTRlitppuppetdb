@@ -1,0 +1,12 @@
+--- ext/files/config.ini	2015-10-13 23:23:41.000000000 +0100
++++ ext/files/config.ini	2019-02-20 15:32:13.990259587 +0000
+@@ -13,7 +13,7 @@ logging-config = /etc/puppetdb/logback.x
+ # threads = 4
+ 
+ # Maximum amount of disk space (in MB) to allow for ActiveMQ persistent message storage
+-# store-usage = 102400
++store-usage = 200 
+ 
+ # Maximum amount of disk space (in MB) to allow for ActiveMQ temporary message storage
+-# temp-usage = 51200
++temp-usage = 100

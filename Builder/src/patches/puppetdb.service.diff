@@ -1,0 +1,14 @@
+--- ext/files/systemd/puppetdb.service	2020-03-25 19:04:03.354767278 +0000
++++ ext/files/systemd/puppetdb.service	2020-03-25 19:03:47.182620512 +0000
+@@ -7,7 +7,10 @@ Type=simple
+ EnvironmentFile=/etc/sysconfig/puppetdb
+ User=puppetdb
+ PIDFile=/var/run/puppetdb/puppetdb.pid
+-ExecStart=/usr/lib/jvm/jre-1.7.0-openjdk/bin/java \
++ExecStartPre=/bin/bash -c "if [ -e '/var/log/puppetdb/puppetdb-oom.hprof' ] ; then \
++   mv /var/log/puppetdb/puppetdb-oom.hprof /var/log/puppetdb/puppetdb-oom.hprof.prev ; \
++fi"
++ExecStart=/usr/java/default/bin/java \
+           $JAVA_ARGS \
+           -cp ${INSTALL_DIR}/puppetdb.jar \
+           clojure.main -m com.puppetlabs.puppetdb.core \

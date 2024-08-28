@@ -1,0 +1,14 @@
+--- ext/files/puppetdb.default.systemd	2015-10-13 23:23:41.000000000 +0100
++++ ext/files/puppetdb.default.systemd	2020-03-25 17:56:48.348166135 +0000
+@@ -3,9 +3,9 @@
+ ###########################################
+ 
+ # Location of your Java binary
+-JAVA_BIN="/usr/lib/jvm/jre-1.7.0-openjdk/bin/java"
++JAVA_BIN="/usr/java/default/bin/java"
+ # Modify this if you'd like to change the memory allocation, enable JMX, etc
+-JAVA_ARGS="-Xmx192m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/log/puppetdb/puppetdb-oom.hprof -Djava.security.egd=file:/dev/urandom"
++JAVA_ARGS="-Xmx4g -XX:OnOutOfMemoryError=\"kill -9 %p\" -XX:+UseParallelGC -Djava.security.egd=file:/dev/urandom"
+ 
+ # These normally shouldn't need to be edited if using OS packages
+ USER="puppetdb"

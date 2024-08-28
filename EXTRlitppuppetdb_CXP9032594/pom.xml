@@ -1,0 +1,76 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.ericsson.nms.litp.3pps</groupId>
+    <artifactId>EXTRlitppuppetdb_CXP9032594</artifactId>
+    <packaging>pom</packaging>
+    <name>[${project.artifactId}] RPM module</name>
+    <description>LITP puppetdb</description>
+
+    <parent>
+        <groupId>com.ericsson.nms.litp.3pps</groupId>
+        <artifactId>EXTRlitppuppetdb</artifactId>
+        <version>2.4.1-SNAPSHOT</version>
+    </parent>
+
+    <properties>
+        <!-- publishes the rpm module to the ci portal -->
+        <publish_artifact>true</publish_artifact>
+        <packaging.type>rpm</packaging.type>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>Copy RPM</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>
+                                        ${project.parent.basedir}/Builder/target/RPM/
+                                    </directory>
+                                    <filtering>false</filtering>
+                                    <includes>
+                                        <include>EXTRlitppuppetdb_CXP9032594-*.rpm</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <id>attach_deliver_EXTRlitppuppetdb_CXP9032594</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>${project.build.directory}/EXTRlitppuppetdb_CXP9032594-${rpm.version}.noarch.rpm</file>
+                                    <type>rpm</type>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

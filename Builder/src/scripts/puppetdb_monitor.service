@@ -1,0 +1,22 @@
+[Unit]
+Description=puppetdb monitor Service
+After=syslog.target network.target
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/sysconfig/puppetdb
+User=root
+TimeoutStartSec=60
+TimeoutStopSec=60
+
+PermissionsStartOnly=true
+ExecStartPre=/usr/bin/install --group=puppet --owner=puppet -d /var/run/puppet
+
+ExecStart=/usr/bin/bash /usr/share/puppetdb/scripts/puppetdb_monitor.sh
+KillMode=process
+
+SuccessExitStatus=0
+StandardOutput=syslog
+
+[Install]
+WantedBy=multi-user.target
